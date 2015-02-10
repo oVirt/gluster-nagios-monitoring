@@ -1,5 +1,8 @@
 {
     "name": "GlusterNagiosMonitoring",
     "url": "plugin/GlusterNagiosMonitoring/start.html",
-    "resourcePath": "gluster-nagios-monitoring"
+    "resourcePath": "gluster-nagios-monitoring",
+    "config": {
+        "showDashboard": "true"
+    }
 }

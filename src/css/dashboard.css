@@ -1,79 +1,193 @@
-.dashboard-panel {
-	padding: 5px;
+body {
+  font-family: "Titillium Web", sans-serif;
+  background-color: #d4d4d4;
 }
 
-.nav, .pagination, .carousel, .panel-title a {
-    cursor: pointer;
+.custom-gutter {
+  margin: 0px;
+  padding: 0px;
 }
 
-.trends-panel {
-	width: 100%;
-	height: 100px;
-	background-color: #E6E6FA;
+.card {
+  min-height: 180px;
+  margin: 6px;
+  background-color: #F5F5F5;
+  background-color: #FFF;
+  /*box-shadow: 0 1px 2px rgba(34, 25, 25, 0.4);*/
+  border: solid 1px #c4c4c4;
+  padding: 10px;
+  position: relative;
+  border-radius: 8px;
 }
 
-.trends-search-panel {
-	width: 1075px;
-	margin: 0 auto;
+.card-title {
+  color: #37424a;
+  font-family: "Titillium Web", sans-serif;
+  font-size: 1.35em;
+  font-weight: 300;
+  text-transform: uppercase;
+  float: left;
 }
 
-.datetime-panel {
-	padding-left: 10px;
-	width: 370px;
-	float: left;
+.card-body {
+  width: 50%;
+  float: left;
+  height: 80px;
+  margin-top: 40px;
+  text-align: center;
 }
 
-.range-label {
-	padding-top: 40px;
-	padding-right: 10px;
-	float: left;
+.card-body-flip {
+  width: 50%;
+  float: left;
+  margin-top: 10px;
+  text-align: center;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(34, 25, 25, 0.7);
 }
 
-.date-panel {
-	padding-top: 35px;
-	width: 150px;
-	float: left;
+.clear {
+  clear: both;
 }
 
-.time-panel {
-	padding-left: 10px;
-	width: 150px;
-	float: left;
+.card-body-card {
+  margin-right: 8px;
+  margin-bottom: 8px;
+  background-color: #F9F9F9;
+  box-shadow: 0 1px 2px 0 rgba(34, 25, 25, 0.4);
 }
 
-.action-panel {
-	padding-left: 5px;
-	padding-top: 35px;
-	width: 140px;
-	float: left;
+.dash-bold {
+  display: block;
+  padding: 5px;
+  text-align: center;
+  font-size: 1.3em;
 }
 
-.trendsActions {
-	padding-top: 3px;
-	width:20px;
-	height: 24px;
-	border: 1px solid #E6E6FA;
-	float: left;
+.dash-bold>i {
+  text-align: left;
 }
 
-.trendsActions:hover {
-	border: 1px solid #96B7D6;
-	cursor: pointer;
-	cursor: hand;
+.card .headline {
+  font-size: 3em;
+  text-align: center;
 }
 
-.nagiosHomeLink {
-	padding-top: 35px;
-	float:left;
-	color: rgb(0,0,255);
+.card .headline {
+  font-size: 3em;
+  margin-top: 0.35em;
+  text-align: center;
 }
 
-.nagiosHomeLink:hover {
-	float:left;
-	color: rgb(0,0,255);
-	text-decoration: underline;
-	-moz-text-decoration-color: blue;
-	text-decoration-color: blue;
-	cursor: pointer;
-        cursor: hand;
+.card .subline {
+  color: #5e6a71;
+  font-family: "Titillium Web", sans-serif;
+  font-size: 1.5em;
+  font-weight: 300;
+  margin-top: 10px;
+  text-align: center;
+}
+
+.card .content {
+  margin-top: 50px;
+}
+
+.card .inner-title {
+  font-family: "Titillium Web", sans-serif;
+  font-size: 1.25em;
+  font-weight: 300;
+  margin-top: 20px;
+  text-align: center;
+}
+
+.card .inner-title-flip {
+  font-family: "Titillium Web", sans-serif;
+  font-size: 1.25em;
+  font-weight: 300;
+  text-align: center;
+}
+
+.ok {
+  color: #4AD170;
+}
+
+.critical {
+  color: #E35C5C;
+}
+
+.warning {
+  color: #FF8C1B;
+}
+
+.gray {
+  color: gray;
+}
+
+.card-status {
+  position: absolute;
+  right: 10px;
+  font-size: 4em;
+  top: -6px;
+}
+
+a {
+  color: inherit;
+  text-decoration: inherit;
+}
+
+a:hover {
+  color: inherit;
+  text-decoration: inherit;
+}
+
+.blink {
+  text-decoration: blink;
+}
+
+.center {
+  text-align: center;
+}
+
+.dash_header {
+  min-height: 55px;
+}
+
+.bold {
+  font-size: 1.6em;
+  font-weight: 400;
+}
+
+.subline:hover {
+  font-size: 1.65em;
+}
+
+.alert-dialog {
+  height: auto;
+  max-height: 350px;
+  overflow: auto;
+  padding-right: 10px;
+}
+
+.superfix-badge {
+  display: block;
+  position: absolute;
+  font-family: "Titillium Web",sans-serif;
+  top: -12px;
+  right: -10px;
+  line-height: 16px;
+  height: 16px;
+  padding: 0 5px;
+  color: white;
+  border-width: 1px;
+  border-style: solid;
+  border-radius: 10px;
+  border-color: #5E6A71;
+  background-color: #5E6A71;
+}
+
+.header-badge {
+  font-size: 1.15em;
+  font-weight: 400;
+  padding: 2px 10px;
+  border-radius: 30px;
 }

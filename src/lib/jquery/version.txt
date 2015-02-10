@@ -1,0 +1,2 @@
+jquery 		v 1.11.2
+jquery UI 	v 1.11.3

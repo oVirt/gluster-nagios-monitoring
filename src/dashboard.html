@@ -1,95 +1,157 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link href="lib/bootstrap/css/bootstrap.min.css" rel="stylesheet"/>
-        <link href="css/dashboard.css" rel="stylesheet"/>
+<html lang="en">
 
-        <script src="lib/angular/js/angular.min.js"></script>
-        <script src="lib/ui-bootstrap/js/ui-bootstrap-tpls.min.js"></script>
-        <script src="js/services.js"></script>
-        <script src="js/dashboard.js"></script>
-    </head>
-    <body ng-app="dashboardApp">
-        <div class="dashboard-panel">
-            <div ng-controller="SummaryCtrl">
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th> Clusters </th>
-                            <th> Hosts </th>
-                            <th> Volumes </th>
-                            <th> Bricks </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td> {{summary.no_of_clusters}} </td>
-                            <td> 
-                                {{summary.hosts_up}} <img src="images/up.png"/> &nbsp;
-                                {{summary.hosts_down}} <img src="images/down.png"/>
-                            </td>
-                            <td> 
-                                {{summary.volumes_up}} <img src="images/up.png"/> &nbsp;
-                                {{summary.volumes_down}} <img src="images/down.png"/>
-                            </td>
-                            <td> 
-                                {{summary.bricks_up}} <img src="images/up.png"/> &nbsp;
-                                {{summary.bricks_down}} <img src="images/down.png"/>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.min.css" />
+    <script src="lib/jquery/js/jquery.min.js" type="text/javascript"></script>
+    <script src="lib/bootstrap/js/bootstrap.min.js" type="text/javascript"></script>
+    <link href="lib/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+    <script src="lib/angular/js/angular.min.js" type="text/javascript"></script>
+    <script src="lib/ui-bootstrap/js/ui-bootstrap-tpls.min.js" type="text/javascript"></script>
+    <script src="js/services.js" type="text/javascript"></script>
+    <script src="js/dashboard.js" type="text/javascript"></script>
+    <link type="text/css" rel="stylesheet" href="lib/qtip/css/jquery.qtip.min.css" />
+    <script type="text/javascript" src="lib/qtip/js/jquery.qtip.min.js"></script>
+    <script src="lib/jquery/js/jquery-ui.js"></script>
+    <link rel="stylesheet" href="lib/jquery/css/jquery-ui.css" />
+    <link href="css/dashboard.css" rel="stylesheet" /> </head>
 
-            <div class="panel panel-danger" ng-controller="AlertsCtrl">
-                <div class="panel-heading">
-                    <h3 class="panel-title">
-                        Alerts 
-                        <span class="badge">{{alerts.length}}</span> 
-                        <a ng-click="refreshAlerts()"><span class="pull-right glyphicon glyphicon-refresh"></span></a>
-                    </h3>
+<body ng-app="dashboardApp" ng-controller="SummaryCtrl">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="card dash_header"> <span class="card-title center " ng-if="summary.selected_cluster=='undefined'">
+                    <i class="fa fa-dashboard fa-lg"></i>
+                            All Clusters <label class="badge header-badge"> {{summary.cluster_list.length}} </label>
+                </span> <span class="card-title center " ng-if="summary.selected_cluster!='undefined'">
+                    <i class="fa fa-dashboard fa-lg"></i>
+                            {{summary.selected_cluster.name}}
+                </span>
+                <div class="dropdown pull-right">
+                    <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-expanded="true"> <i class="fa fa-tasks fa-lg"></i> <span ng-if="summary.selected_cluster=='undefined'">All Clusters</span> <span ng-if="summary.selected_cluster!='undefined'">{{summary.selected_cluster.name}}</span> <span class="caret"></span> </button>
+                    <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+                        <li role="presentation"><a role="menuitem" tabindex="-1" ng-click="switchCluster('undefined')">All Clusters</a> </li>
+                        <li role="presentation" ng-repeat="cluster in summary.cluster_list"><a role="menuitem" tabindex="-1" ng-click="switchCluster(cluster)">{{cluster.name}}</a> </li>
+                    </ul>
                 </div>
-                <div class="panel-body" ng-if="alerts.length==0">
-                    No Alerts present
+                <label ng-if="summary.health_status=='Unhealthy'" class="critical hasTooltip card-title bold pull-right">
+                    <label ng-if="summary.selected_cluster.name=='All Clusters'" class="gray"></label><i class="fa fa-lg fa-heartbeat" style="color:#E35C5C;"><a ng-if="summary.selected_cluster=='undefined'" class="badge superfix-badge">{{summary.unhealthy_cluster_list.length}}</a></i> &nbsp;&nbsp;&nbsp;&nbsp; </label>
+                <div class="hidden" title="Unhealthy Clusters" ng-if="summary.selected_cluster=='undefined'">
+                    <div role="presentation" style="text-align:center;" ng-repeat="cluster in summary.unhealthy_cluster_list">{{cluster.name}}</div>
                 </div>
-                <div ng-if="alerts.length>0">
-                    <table class="table table-striped table-condensed table-bordered">
-                        <thead>
-                            <tr>
-                                <th style="width:40%"> Description</th>
-                                <th style="width:20%"> Time </th>
-                                <th style="width:20%"> Origin </th>
-                                <th style="width:20%"> Custom ID </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr ng-repeat="alert in alerts">
-                                <td style="width:40%"> {{alert.description}} </td>
-                                <td style="width:20%"> {{alert.time | date:'medium'}} </td>
-                                <td style="width:20%"> {{alert.origin}} </td>
-                                <td style="width:20%"> {{alert.custom_id}} </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <div ng-controller="ClustersCtrl">
-              <accordion close-others="false">
-                <accordion-group is-open="isopen" ng-repeat="cluster in clusters">
-                    <accordion-heading>
-                        <i class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': isopen, 'glyphicon-chevron-right': !isopen}"></i>
-                        {{cluster.name}} [Cluster]
-                    </accordion-heading>
-                    <div ng-repeat="volume in cluster.volumes">
-                        {{volume.name}}
-                    </div>
-                </accordion-group>
-              </accordion>
             </div>
         </div>
-    </body>
+        <div class="row">
+            <div class="col-lg-4 col-md-4 col-sm-6 col-xs-6 custom-gutter">
+                <div class="card vol_card"> <i ng-if="summary.max_vol_usage > 80" class="fa fa-exclamation-circle critical fa-lg card-status"></i> <i ng-if="summary.max_vol_usage < 81" class="fa fa-check-circle ok fa-lg card-status"></i> <span class="card-title"> <i class="fa fa-pie-chart fa-lg"></i>
+                            <span class="capacity-title">Capacity</span> </span>
+                    <a href="./../../#volumes" target="_top">
+                        <div class="cpu-hover card-body-flip front_volume hasTooltip" style="position:relative; width:100%;height: 120px;">
+                            <div class="inner-title" style="float:left;width:33%;padding-bottom:20px;"> {{summary.total_space_units}}
+                                <br/>Total </div>
+                            <div class="inner-title" style="float:left;width:33%;"> {{summary.available_space_units}}
+                                <br/>Free </div>
+                            <div class="inner-title" style="float:left;width:33%;"> {{summary.used_space_units}}
+                                <br/>Used </div>
+                            <div class="progress" style="clear:both;margin:10px;">
+                                <div class="progress-bar progress-bar-success" style="background-image:none;background-color:#4AD170;color:#000;width:{{summary.used_space/summary.total_space*100}}%"> {{(summary.used_space/summary.total_space*100) | number : 2}}% </div>
+                            </div>
+                        </div>
+                        <div class="hidden" title="Top space utilizers" ng-if="summary.volume_usage_percent.length>0">
+                            <div ng-repeat="usage in summary.volume_usage_percent" ng-if="$index < 3">
+                                <p class="gray" align="center" style="line-height:1em;"> <span class="usage" ng-if="usage['usage'] < 81"><b class="ok">{{usage["usage"]}}% </b>- {{usage["name"]}}</span> <span class="usage" ng-if="usage['usage'] > 80 && usage['usage'] < 91"><b class="warning">{{usage["usage"]}}% </b>- {{usage["name"]}}</span> <span class="usage" ng-if="usage['usage'] > 90"><b class="critical">{{usage["usage"]}}% </b>- {{usage["name"]}}</span> </p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-6 col-xs-6 custom-gutter">
+                <div class="card cpu_mem"> <i ng-if="summary.max_cpu > 80 || summary.max_memory > 80" class="fa fa-exclamation-circle critical fa-lg card-status"></i> <i ng-if="summary.max_cpu < 81 && summary.max_memory < 81" class="fa fa-check-circle ok fa-lg card-status"></i> <span class="card-title"> <i class="fa fa-line-chart fa-lg"></i>
+                            <span class="performance-title">Performance</span> </span>
+                    <a href="./../../#hosts" target="_top">
+                        <div class="front" style="">
+                            <div class="card-body clear inner-title cpu hasTooltip">
+                                <div class="dash-bold"> <i class="fa fa-laptop"></i> {{summary.average_cpu_usage}} % </div> CPU </div>
+                            <div class="hidden" title="Top CPU utilizers">
+                                <div ng-repeat="usage in summary.cpu_usage_list" ng-if="$index < 4">
+                                    <p class="gray" align="justify" style="line-height:1em;padding-left:10px;"> <span class="usage" ng-if="usage['usage'] < 81"><b class="ok">{{usage["usage"]}}% </b>- {{usage["name"]}}</span> <span class="usage" ng-if="usage['usage'] > 80 && usage['usage'] < 91"><b class="warning">{{usage["usage"]}}% </b>- {{usage["name"]}}</span> <span class="usage" ng-if="usage['usage'] > 90"><b class="critical">{{usage["usage"]}}% </b>- {{usage["name"]}}</span> </p>
+                                </div>
+                            </div>
+                            <div class="card-body inner-title mem hasTooltip">
+                                <div class="dash-bold"> <i class="fa fa-database "></i> {{summary.average_memory_usage}} % </div> Memory </div>
+                            <div class="hidden" title="Top Memory utilizers">
+                                <div ng-repeat="usage in summary.memory_usage_list" ng-if="$index < 4">
+                                    <p class="gray" align="justify" style="line-height:1em;padding-left:10px;"> <span class="usage" ng-if="usage['usage'] < 81"><b class="ok">{{usage["usage"]}}% </b>- {{usage["name"]}}</span> <span class="usage" ng-if="usage['usage'] > 80 && usage['usage'] < 91"><b class="warning">{{usage["usage"]}}% </b>- {{usage["name"]}}</span> <span class="usage" ng-if="usage['usage'] > 90"><b class="critical">{{usage["usage"]}}% </b>- {{usage["name"]}}</span> </p>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12 custom-gutter">
+                <div class="card"> <span class="card-title">
+                    <i class="fa fa-exclamation-triangle fa-lg"></i> Alerts
+                        </span>
+                    <div class="content">
+                        <!-- <a href="./../../#events" target="_top"> -->
+                        <div class="headline"> <i ng-if="summary.alerts.length==0" class="fa fa-check-circle ok fa-lg"></i> <i ng-if="summary.alerts.length>0" class="fa fa-exclamation-circle critical fa-lg"></i> </div>
+                        <div class="subline" ng-if="summary.alerts.length>0"> <a data-toggle="modal" data-target="#myModal">{{summary.alerts.length}} alerts <i class="fa fa-external-link"></i></a> </div>
+                        <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-lg">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span> </button>
+                                        <h4 class="modal-title" id="myModalLabel"><i class="fa fa-2 fa-exclamation-circle critical"></i> Alerts</h4> </div>
+                                    <div class="modal-body">
+                                        <div class="alert-dialog" title="Alerts">
+                                            <div ng-repeat="alert in summary.alerts">
+                                                <div class="alert alert-danger alert-dismissible" role="alert">
+                                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close" ng-click="deleteAlert(alert)"><span aria-hidden="true">&times;</span> </button> <strong style="color:#000;">{{alert.time | date:'medium'}}</strong>
+                                                    <br/>{{alert.description}} </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- </a> -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 custom-gutter">
+                <div class="card"> <i ng-if="summary.hosts_down_list.length>0" class="fa fa-exclamation-circle critical fa-lg card-status"></i> <i ng-if="summary.hosts_down_list.length==0" class="fa fa-check-circle ok fa-lg card-status"></i> <span class="card-title"> <i class="fa fa-desktop fa-lg"></i>
+                        Hosts
+                    </span>
+                    <div class="content">
+                        <a href="./../../#hosts" target="_top">
+                            <div class="headline">{{summary.hosts_up+summary.hosts_down_list.length}}</div>
+                            <div class="subline hasTooltip" ng-if="summary.hosts_down_list.length>0">{{summary.hosts_down_list.length}} Down </div>
+                            <div class="hidden" title="Hosts Down">
+                                <div role="presentation" ng-repeat="host in summary.hosts_down_list">{{host}}</div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 custom-gutter">
+                <div class="card"> <i ng-if="(summary.volumes_degraded + summary.volumes_down + summary.volumes_partial)==0" class="fa fa-check-circle ok fa-lg card-status"></i> <i ng-if="summary.volumes_degraded>0 && summary.volumes_down==0" class="fa fa-exclamation-circle warning fa-lg card-status"></i> <i ng-if="summary.volumes_down>0 || summary.volumes_partial>0" class="fa fa-exclamation-circle critical fa-lg card-status"></i> <span class="card-title"> <i class="fa fa-database fa-lg"></i>
+                            Volumes
+                        </span>
+                    <div class="content">
+                        <a href="./../../#volumes" target="_top">
+                            <div class="headline">{{summary.volumes_up+summary.volumes_stopped}}</div>
+                            <div class="subline hasTooltip"> <span ng-if="summary.volumes_degraded>0"> {{summary.volumes_degraded}}-Degraded </span> <span ng-if="summary.volumes_partial>0"> {{summary.volumes_partial}}-Partial </span> <span ng-if="summary.volumes_down>0"> {{summary.volumes_down}}-Down </span> <span ng-if="summary.volumes_stopped>0"> {{summary.volumes_stopped}}-Stopped </span> </div>
+                            <div class="hidden" title="Critical Volumes">
+                                <div role="presentation" ng-repeat="volume in summary.unhealthy_volumes">{{volume["name"]}} - {{volume["status"]}}</div>
+                            </div>
+                        </a>
+                    </div> {{tooltip()}}</div>
+            </div>
+        </div>
+    </div>
+</body>
+
 </html>
