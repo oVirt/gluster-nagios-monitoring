@@ -102,6 +102,38 @@
                         return [];
                     }
                 });
+            },
+            getNics: function(hostId, hostName) {
+                return $http({
+                    method: 'GET',
+                    url: '/ovirt-engine/api/hosts/' + hostId + '/nics'
+                }).
+                then(function(response) {
+                    if (typeof response.data.host_nic !== 'undefined') {
+                        var hostNicInfo = [];
+                        hostNicInfo["host_name"] = hostName;
+                        hostNicInfo["nic"] = response.data.host_nic;
+                        return hostNicInfo;
+                    } else {
+                        return [];
+                    }
+                });
+            },
+            getNicStats: function(hostId, nicId, ip) {
+                return $http({
+                    method: 'GET',
+                    url: '/ovirt-engine/api/hosts/' + hostId + '/nics/' + nicId + '/statistics'
+                }).
+                then(function(response) {
+                    if (typeof response.data.statistic !== 'undefined') {
+                        var nicStat = [];
+                        nicStat["ip"] = ip;
+                        nicStat["statistic"] = response.data.statistic;
+                        return nicStat;
+                    } else {
+                        return [];
+                    }
+                });
             }
         }
     }
@@ -166,7 +198,6 @@
             convertSize: function(bytes) {
                 var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
                 var posttxt = 0;
-                if (bytes == 0) return 'n/a';
                 if (bytes < 1024) {
                     return Number(bytes) + " " + sizes[posttxt];
                 }
@@ -179,6 +210,4 @@
         }
     }
     mod.factory('UtilService', [utilService]);
-}(
-    angular.module('plugin.dashboard.services', [])
-));
+}(angular.module('plugin.dashboard.services', [])));

@@ -29,7 +29,13 @@
             volume_usage_percent: [],
             max_vol_usage: 0,
             all_volumes: [],
-            volume_Stat_Update_Flag: 0
+            volume_Stat_Update_Flag: 0,
+            nic_up: 0,
+            nic_down_list: [],
+            average_data_received: 0,
+            average_data_transmitted: 0,
+            data_received_list: [],
+            data_transmitted_list: []
         };
         $interval(function() {
             loadData($scope, $q, clusterService, volumeService, hostService, utilService, alertService);
@@ -59,8 +65,8 @@
             $('.hasTooltip').each(function() {
                 $(this).qtip({
                     position: {
-                        my: 'top center',
-                        at: 'bottom center',
+                        my: 'bottom center',
+                        at: 'top center',
                         target: $(this)
                     },
                     style: {
@@ -92,7 +98,7 @@
                 var total_volume_used = 0;
                 var total_volume_available = 0;
                 if (volume_statistics.length > 0) {
-                    total_volume_available += parseInt(volume_statistics.filter(function(statistics) {
+                    total_volume_available = parseInt(volume_statistics.filter(function(statistics) {
                         return statistics.name === 'memory.free.size';
                     })[0].values.value[0].datum);
                     total_volume_used = parseInt(volume_statistics.filter(function(statistics) {
@@ -131,7 +137,6 @@
             $scope.summary.available_space_units = utilService.convertSize(available_space);
             $scope.summary.used_space_units = utilService.convertSize(used_space);
             $scope.summary.total_space_units = utilService.convertSize(total_space);
-
         });
     }
     var loadData = function($scope, $q, clusterService, volumeService, hostService, utilService, alertService) {
@@ -169,16 +174,13 @@
                         status: "Stopped"
                     });
                     volumes_stopped++;
-                }
-                else{
+                } else {
                     volumes_up++;
                     bricks_promise.push(volumeService.getBricks(volume.cluster.id, volume.id, volume.name, volume.replica_count));
                 }
             });
             $scope.summary.volumes_stopped = volumes_stopped;
             $scope.summary.volumes_up = volumes_up;
-
-
             $q.all(bricks_promise).then(function(bricks_in_volumes) {
                 var health_status = "Healthy";
                 var unhealthy_cluster_ids = [];
@@ -247,14 +249,14 @@
                 $scope.summary.health_status = health_status;
                 $scope.summary.unhealthy_volumes = unhealthy_volumes;
                 var unhealthy_cluster_list = $scope.summary.cluster_list.filter(function(cluster) {
-                for (var i = 0; i < Object.keys(unhealthy_cluster_ids).length; i++) {
-                    if (Object.keys(unhealthy_cluster_ids)[i] == cluster.id) {
-                        return true;
+                    for (var i = 0; i < Object.keys(unhealthy_cluster_ids).length; i++) {
+                        if (Object.keys(unhealthy_cluster_ids)[i] == cluster.id) {
+                            return true;
+                        }
                     }
-                }
-                return false;
-            });
-            $scope.summary.unhealthy_cluster_list = unhealthy_cluster_list;
+                    return false;
+                });
+                $scope.summary.unhealthy_cluster_list = unhealthy_cluster_list;
             });
         })
         hostService.getHosts($scope.summary.selected_cluster).
@@ -271,11 +273,69 @@
             });
             $scope.summary.hosts_down_list = hosts_down_list;
             $scope.summary.hosts_up = up_hosts.length;
-            var hostPromises = [];
+            var host_promises = [];
+            var host_nic_promises = [];
             angular.forEach(up_hosts, function(host) {
-                hostPromises.push(hostService.getHostStatistics(host.id, host.name));
+                host_promises.push(hostService.getHostStatistics(host.id, host.name));
+                host_nic_promises.push(hostService.getNics(host.id, host.name));
             });
-            return $q.all(hostPromises);
+            $q.all(host_nic_promises).then(function(host_nic) {
+                var host_nic_stat_promises = [];
+                var nic_up = 0;
+                var nic_down_list = [];
+                angular.forEach(host_nic, function(host_nic) {
+                    var host_name = host_nic.host_name;
+                    angular.forEach(host_nic.nic, function(nic) {
+                        if (nic.status.state != 'up') {
+                            nic_down_list.push({
+                                host_name: host_name,
+                                state: nic.status.state,
+                                nic_name: nic.name
+                            });
+                        } else {
+                            nic_up++;
+                            host_nic_stat_promises.push(hostService.getNicStats(nic.host.id, nic.id, nic.ip));
+                        }
+                    });
+                });
+                $scope.summary.nic_up = nic_up;
+                $scope.summary.nic_down_list = nic_down_list;
+                return $q.all(host_nic_stat_promises);
+            }).then(function(host_nic_stats) {
+                var total_data_received = 0;
+                var total_data_transmitted = 0;
+                var data_received_list = [];
+                var data_transmitted_list = [];
+                angular.forEach(host_nic_stats, function(host_nic_stats_obj) {
+                    var nic_statistics = host_nic_stats_obj["statistic"];
+                    var ip = host_nic_stats_obj["ip"];
+                    var data_received = 0;
+                    var data_transmitted = 0;
+                    data_received = parseInt(nic_statistics.filter(function(statistics) {
+                        return statistics.name === 'data.current.rx';
+                    })[0].values.value[0].datum);
+                    data_transmitted = parseInt(nic_statistics.filter(function(statistics) {
+                        return statistics.name === 'data.current.tx';
+                    })[0].values.value[0].datum);
+                    data_received = isNaN(data_received) ? 0 : data_received;
+                    data_transmitted = isNaN(data_transmitted) ? 0 : data_transmitted;
+                    data_received_list.push({
+                        usage: utilService.convertSize(data_received),
+                        ip: ip.address
+                    });
+                    data_transmitted_list.push({
+                        usage: utilService.convertSize(data_transmitted),
+                        ip: ip.address
+                    });
+                    total_data_received += data_received;
+                    total_data_transmitted += data_transmitted;
+                });
+                $scope.summary.average_data_received = utilService.convertSize(total_data_received / host_nic_stats.length);
+                $scope.summary.average_data_transmitted = utilService.convertSize(total_data_transmitted / host_nic_stats.length);
+                $scope.summary.data_received_list = data_received_list;
+                $scope.summary.data_transmitted_list = data_transmitted_list;
+            });
+            return $q.all(host_promises);
         }).then(function(hostStatistics) {
             var total_memory_usage_percent = 0;
             var total_cpu_usage_percent = 0;
@@ -346,24 +406,23 @@
             $scope.summary.alerts = data;
         });
     }
-    mod.factory('sessionManager', ['$window',  function ($window) {
+    mod.factory('sessionManager', ['$window', function($window) {
         var sessionId;
-        return{
-            init: function(session){
+        return {
+            init: function(session) {
                 sessionId = session;
             },
             getSessionId: function() {
                 return sessionId;
             },
-            exposeSession: function(){
-               var caller = this;
-               $window.setSessionId = function (sessionId) {
+            exposeSession: function() {
+                var caller = this;
+                $window.setSessionId = function(sessionId) {
                     caller.init(sessionId);
                 };
             }
         };
     }]);
-
     mod.controller("SummaryCtrl", ['$scope', '$interval', '$q', 'ClusterService', 'VolumeService', 'HostService', 'UtilService', 'AlertService', summaryCtrl]);
     mod.config(function($httpProvider) {
         $httpProvider.defaults.headers.common = {
@@ -371,18 +430,16 @@
             'Prefer': 'persistent-auth'
         };
         $httpProvider.defaults.withCredentials = true;
-
         $httpProvider.interceptors.push(function(sessionManager) {
             return {
-               'request': function(config) {
+                'request': function(config) {
                     config.headers.JSESSIONID = sessionManager.getSessionId();
-                   return config;
+                    return config;
                 }
             };
         });
     });
-
-    mod.run(['sessionManager','messageUtil', function (sessionManager, messageUtil) {
+    mod.run(['sessionManager', 'messageUtil', function(sessionManager, messageUtil) {
         sessionManager.exposeSession();
         messageUtil.sendMessageToParent('getSession');
     }]);

@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.min.css" />
     <script src="lib/jquery/js/jquery.min.js" type="text/javascript"></script>
     <script src="lib/bootstrap/js/bootstrap.min.js" type="text/javascript"></script>
-    <link href="lib/font-awesome/css/font-awesome.min.css" rel="stylesheet"/>
+    <link href="lib/font-awesome/css/font-awesome.min.css" rel="stylesheet" />
     <script src="lib/angular/js/angular.min.js" type="text/javascript"></script>
     <script src="lib/ui-bootstrap/js/ui-bootstrap-tpls.min.js" type="text/javascript"></script>
     <script src="js/services.js" type="text/javascript"></script>
@@ -49,8 +49,7 @@
                             <span class="capacity-title">Capacity</span> </span>
                     <a href="./../../#volumes" target="_top">
                         <div ng-if="summary.all_volumes.length == 0">
-                            <div class="inner-title" style="padding-bottom:20px;padding-top:50px;">
-                                No Volume found</div>
+                            <div class="inner-title center-error"> No Volume found</div>
                         </div>
                         <div ng-if="summary.all_volumes.length > 0" class="cpu-hover card-body-flip front_volume hasTooltip" style="position:relative; width:100%;height: 120px;">
                             <div class="inner-title" style="float:left;width:33%;padding-bottom:20px;"> {{summary.total_space_units}}
@@ -73,13 +72,12 @@
             </div>
             <div class="col-lg-4 col-md-4 col-sm-6 col-xs-6 custom-gutter">
                 <div class="card cpu_mem"> <i ng-if="summary.max_cpu > 80 || summary.max_memory > 80" class="fa fa-exclamation-circle critical fa-lg card-status"></i> <i ng-if="summary.max_cpu < 81 && summary.max_memory < 81" class="fa fa-check-circle ok fa-lg card-status"></i> <span class="card-title"> <i class="fa fa-line-chart fa-lg"></i>
-                            <span class="performance-title">Performance</span> </span>
+                            <span class="performance-title">Utilization</span> </span>
                     <a href="./../../#hosts" target="_top">
                         <div ng-if="summary.cpu_usage_list.length == 0">
-                            <div class="inner-title" style="padding-bottom:20px;padding-top:50px;">
-                                No UP host found</div>
+                            <div class="inner-title center-error"> No UP host found</div>
                         </div>
-                        <div  ng-if="summary.cpu_usage_list.length > 0" class="front">
+                        <div ng-if="summary.cpu_usage_list.length > 0" class="front">
                             <div ng-if="summary.cpu_usage_list.length > 0" class="card-body clear inner-title cpu hasTooltip">
                                 <div class="dash-bold"> <i class="fa fa-laptop"></i> {{summary.average_cpu_usage}} % </div> CPU </div>
                             <div class="hidden" title="Top CPU utilizers">
@@ -130,7 +128,7 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 custom-gutter">
+            <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6 custom-gutter">
                 <div class="card"> <i ng-if="summary.hosts_down_list.length>0" class="fa fa-exclamation-circle critical fa-lg card-status"></i> <i ng-if="summary.hosts_down_list.length==0" class="fa fa-check-circle ok fa-lg card-status"></i> <span class="card-title"> <i class="fa fa-desktop fa-lg"></i>
                         Hosts
                     </span>
@@ -145,7 +143,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 custom-gutter">
+            <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6 custom-gutter">
                 <div class="card"> <i ng-if="(summary.volumes_degraded + summary.volumes_down + summary.volumes_partial)==0" class="fa fa-check-circle ok fa-lg card-status"></i> <i ng-if="summary.volumes_degraded>0 && summary.volumes_down==0" class="fa fa-exclamation-circle warning fa-lg card-status"></i> <i ng-if="summary.volumes_down>0 || summary.volumes_partial>0" class="fa fa-exclamation-circle critical fa-lg card-status"></i> <span class="card-title"> <i class="fa fa-database fa-lg"></i>
                             Volumes
                         </span>
@@ -158,6 +156,42 @@
                             </div>
                         </a>
                     </div> {{tooltip()}}</div>
+            </div>
+            <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6 custom-gutter">
+                <div class="card"> <i ng-if="summary.nic_down_list.length>0" class="fa fa-exclamation-circle critical fa-lg card-status"></i> <i ng-if="summary.nic_down_list.length==0" class="fa fa-check-circle ok fa-lg card-status"></i> <span class="card-title"> <i class="fa fa-server fa-lg"></i>
+                        NIC
+                    </span>
+                    <div class="content">
+                        <a href="./../../#hosts" target="_top">
+                            <div class="headline">{{summary.nic_up+summary.nic_down_list.length}}</div>
+                            <div class="subline hasTooltip" ng-if="summary.nic_down_list.length>0">{{summary.nic_down_list.length}} Down </div>
+                            <div class="hidden" title="NICs Down">
+                                <div role="presentation" ng-repeat="nic in summary.nic_down_list">{{nic.host_name}} - {{nic.nic_name}} - {{nic.state}}</div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6 custom-gutter">
+                <div class="card cpu_mem"> <span class="card-title"> <i class="fa fa-exchange fa-rotate-90 fa-lg"></i>Network</span>
+                    <a href="./../../#hosts" target="_top">
+                        <div ng-if="summary.nic_up+summary.nic_down_list.length == 0">
+                            <div class="inner-title center-error"> No NIC found</div>
+                        </div>
+                        <div class="front" ng-if="summary.nic_up+summary.nic_down_list.length > 0">
+                            <div class="card-body clear inner-title cpu hasTooltip">
+                                <div class="dash-bold"> <i class="fa fa-cloud-upload"></i> {{summary.average_data_transmitted}}</div> TX </div>
+                            <div class="hidden" title="Top data transmitters">
+                                <div ng-repeat="usage in summary.data_received_list" ng-if="$index < 3"> {{usage["usage"]}} - {{usage["ip"]}} </div>
+                            </div>
+                            <div class="card-body inner-title mem hasTooltip">
+                                <div class="dash-bold"> <i class="fa fa-cloud-download "></i> {{summary.average_data_received}}</div> RX </div>
+                            <div class="hidden" title="Top data Receivers">
+                                <div ng-repeat="usage in summary.data_transmitted_list" ng-if="$index < 3"> {{usage["usage"]}} - {{usage["ip"]}} </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
             </div>
         </div>
     </div>
