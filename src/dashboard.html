@@ -48,7 +48,11 @@
                 <div class="card vol_card"> <i ng-if="summary.max_vol_usage > 80" class="fa fa-exclamation-circle critical fa-lg card-status"></i> <i ng-if="summary.max_vol_usage < 81" class="fa fa-check-circle ok fa-lg card-status"></i> <span class="card-title"> <i class="fa fa-pie-chart fa-lg"></i>
                             <span class="capacity-title">Capacity</span> </span>
                     <a href="./../../#volumes" target="_top">
-                        <div class="cpu-hover card-body-flip front_volume hasTooltip" style="position:relative; width:100%;height: 120px;">
+                        <div ng-if="summary.all_volumes.length == 0">
+                            <div class="inner-title" style="padding-bottom:20px;padding-top:50px;">
+                                No Volume found</div>
+                        </div>
+                        <div ng-if="summary.all_volumes.length > 0" class="cpu-hover card-body-flip front_volume hasTooltip" style="position:relative; width:100%;height: 120px;">
                             <div class="inner-title" style="float:left;width:33%;padding-bottom:20px;"> {{summary.total_space_units}}
                                 <br/>Total </div>
                             <div class="inner-title" style="float:left;width:33%;"> {{summary.available_space_units}}
@@ -71,8 +75,12 @@
                 <div class="card cpu_mem"> <i ng-if="summary.max_cpu > 80 || summary.max_memory > 80" class="fa fa-exclamation-circle critical fa-lg card-status"></i> <i ng-if="summary.max_cpu < 81 && summary.max_memory < 81" class="fa fa-check-circle ok fa-lg card-status"></i> <span class="card-title"> <i class="fa fa-line-chart fa-lg"></i>
                             <span class="performance-title">Performance</span> </span>
                     <a href="./../../#hosts" target="_top">
-                        <div class="front" style="">
-                            <div class="card-body clear inner-title cpu hasTooltip">
+                        <div ng-if="summary.cpu_usage_list.length == 0">
+                            <div class="inner-title" style="padding-bottom:20px;padding-top:50px;">
+                                No UP host found</div>
+                        </div>
+                        <div  ng-if="summary.cpu_usage_list.length > 0" class="front">
+                            <div ng-if="summary.cpu_usage_list.length > 0" class="card-body clear inner-title cpu hasTooltip">
                                 <div class="dash-bold"> <i class="fa fa-laptop"></i> {{summary.average_cpu_usage}} % </div> CPU </div>
                             <div class="hidden" title="Top CPU utilizers">
                                 <div ng-repeat="usage in summary.cpu_usage_list" ng-if="$index < 4">
