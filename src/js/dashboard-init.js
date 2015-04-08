@@ -37,10 +37,14 @@
         };
     }]);
 
-    mod.factory('pluginEventHandlers', ['pluginName', 'tabManager', '$window', function (pluginName, tabManager, $window) {
+    mod.factory('pluginEventHandlers', ['pluginApi','pluginName', 'tabManager', '$window', 'urlUtil', function (pluginApi, pluginName, tabManager, $window, urlUtil) {
+        var sessionId;
         return {
             UiInit: function () {
                 tabManager.addTabs();
+            },
+            RestApiSessionAcquired: function (session) {
+                sessionId = session;
             },
             MessageReceived: function (dataString, sourceWindow) {
                 var data = JSON.parse(dataString);
@@ -48,6 +52,9 @@
                     if (data.action === 'GetTabData') {
                         tabManager.setTabWindow(sourceWindow);
                         tabManager.updateTab();
+                    }
+                    else if(data.action === 'getSession') {
+                        sourceWindow.setSessionId(sessionId);
                     }
                 }
             },

@@ -5,7 +5,7 @@
                 if (cluster !== "undefined") {
                     return $http({
                         method: 'GET',
-                        url: '/api/events?search=' + encodeURIComponent('severity=alert and cluster=' + cluster.name)
+                        url: '/ovirt-engine/api/events?search=' + encodeURIComponent('severity=alert and cluster=' + cluster.name)
                     }).
                     then(function(response) {
                         if (typeof response.data.event !== 'undefined') {
@@ -17,7 +17,7 @@
                 }
                 return $http({
                     method: 'GET',
-                    url: '/api/events?search=severity%3Dalert'
+                    url: '/ovirt-engine/api/events?search=severity%3Dalert'
                 }).
                 then(function(response) {
                     if (typeof response.data.event !== 'undefined') {
@@ -30,7 +30,7 @@
             deleteAlert: function(alertId) {
                 return $http({
                     method: 'DELETE',
-                    url: '/api/events/' + alertId
+                    url: '/ovirt-engine/api/events/' + alertId
                 });
             }
         }
@@ -42,7 +42,7 @@
                 if (cluster !== "undefined") {
                     return $http({
                         method: 'GET',
-                        url: '/api/clusters/?search=' + encodeURIComponent('name=' + cluster.name)
+                        url: '/ovirt-engine/api/clusters/?search=' + encodeURIComponent('name=' + cluster.name)
                     }).
                     then(function(response) {
                         return response.data.cluster;
@@ -50,7 +50,7 @@
                 }
                 return $http({
                     method: 'GET',
-                    url: '/api/clusters'
+                    url: '/ovirt-engine/api/clusters'
                 }).
                 then(function(response) {
                     return response.data.cluster;
@@ -65,7 +65,7 @@
                 if (cluster !== "undefined") {
                     return $http({
                         method: 'GET',
-                        url: '/api/hosts/?search=' + encodeURIComponent('cluster=' + cluster.name)
+                        url: '/ovirt-engine/api/hosts/?search=' + encodeURIComponent('cluster=' + cluster.name)
                     }).
                     then(function(response) {
                         if (typeof response.data.host !== 'undefined') {
@@ -77,7 +77,7 @@
                 }
                 return $http({
                     method: 'GET',
-                    url: '/api/hosts'
+                    url: '/ovirt-engine/api/hosts'
                 }).
                 then(function(response) {
                     if (typeof response.data.host !== 'undefined') {
@@ -90,7 +90,7 @@
             getHostStatistics: function(hostId, hostName) {
                 return $http({
                     method: 'GET',
-                    url: '/api/hosts/' + hostId + '/statistics'
+                    url: '/ovirt-engine/api/hosts/' + hostId + '/statistics'
                 }).
                 then(function(response) {
                     if (typeof response.data.statistic !== 'undefined') {
@@ -109,7 +109,7 @@
     var volumeService = function($http) {
         return {
             getVolumes: function(clusterId) {
-                var volumesUrl = '/api/clusters/' + clusterId + '/glustervolumes';
+                var volumesUrl = '/ovirt-engine/api/clusters/' + clusterId + '/glustervolumes';
                 return $http({
                     method: 'GET',
                     url: volumesUrl
@@ -123,7 +123,7 @@
                 });
             },
             getVolumeStatistics: function(clusterId, volumeId, volumeName) {
-                var statistics = '/api/clusters/' + clusterId + '/glustervolumes/' + volumeId + '/statistics';
+                var statistics = '/ovirt-engine/api/clusters/' + clusterId + '/glustervolumes/' + volumeId + '/statistics';
                 return $http({
                     method: 'GET',
                     url: statistics
@@ -140,7 +140,7 @@
                 });
             },
             getBricks: function(clusterId, volumeId, volumeName, replica_count) {
-                var bricksUrl = '/api/clusters/' + clusterId + '/glustervolumes/' + volumeId + '/bricks';
+                var bricksUrl = '/ovirt-engine/api/clusters/' + clusterId + '/glustervolumes/' + volumeId + '/bricks';
                 return $http({
                     method: 'GET',
                     url: bricksUrl
