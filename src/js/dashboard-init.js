@@ -10,10 +10,10 @@
         var tabWindow, selectedTreeItem;
         return {
             addTabs: function () {
-                if ((pluginApi.configObject().showDashboard && pluginApi.configObject().showDashboard === "true")) {
-                    pluginApi.addMainTab('Dashboard', 'dashboard-tab', urlUtil.relativeUrl('dashboard.html'));
+                if ((pluginApi.configObject().showTrends && pluginApi.configObject().showTrends === "true")) {
+                    pluginApi.addMainTab('Trends', 'trends-tab', urlUtil.relativeUrl('trendsTab.html'));
                 }
-                pluginApi.addMainTab('Trends', 'trends-tab', urlUtil.relativeUrl('trendsTab.html'));
+                pluginApi.addMainTab('Dashboard', 'dashboard-tab', urlUtil.relativeUrl('dashboard.html'));
             },
             setTabWindow: function (window) {
                 tabWindow = window;
