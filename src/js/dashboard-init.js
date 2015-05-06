@@ -13,7 +13,11 @@
                 if ((pluginApi.configObject().showTrends && pluginApi.configObject().showTrends === "true")) {
                     pluginApi.addMainTab('Trends', 'trends-tab', urlUtil.relativeUrl('trendsTab.html'));
                 }
-                pluginApi.addMainTab('Dashboard', 'dashboard-tab', urlUtil.relativeUrl('dashboard.html'));
+                pluginApi.addMainTab('Dashboard', 'dashboard-tab', urlUtil.relativeUrl('dashboard.html'),
+                        {
+                            priority: -1
+                        });
+                pluginApi.revealPlace('dashboard-tab');
             },
             setTabWindow: function (window) {
                 tabWindow = window;
