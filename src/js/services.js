@@ -171,7 +171,7 @@
                     }
                 });
             },
-            getBricks: function(clusterId, volumeId, volumeName, replica_count) {
+            getBricks: function(clusterId, volumeId, volumeName, replica_count, redundancy_count, disperse_count) {
                 var bricksUrl = '/ovirt-engine/api/clusters/' + clusterId + '/glustervolumes/' + volumeId + '/bricks';
                 return $http({
                     method: 'GET',
@@ -181,6 +181,8 @@
                     if (typeof response.data.brick !== 'undefined') {
                         var bricksInfo = [];
                         bricksInfo["replica_count"] = replica_count;
+                        bricksInfo["redundancy_count"] = redundancy_count;
+                        bricksInfo["disperse_count"] = disperse_count;
                         bricksInfo["bricks"] = response.data.brick;
                         bricksInfo["cluster_id"] = clusterId;
                         bricksInfo["volume_name"] = volumeName;

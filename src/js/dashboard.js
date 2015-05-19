@@ -176,7 +176,7 @@
                     volumes_stopped++;
                 } else {
                     volumes_up++;
-                    bricks_promise.push(volumeService.getBricks(volume.cluster.id, volume.id, volume.name, volume.replica_count));
+                    bricks_promise.push(volumeService.getBricks(volume.cluster.id, volume.id, volume.name, volume.replica_count, volume.redundancy_count, volume.disperse_count));
                 }
             });
             $scope.summary.volumes_stopped = volumes_stopped;
@@ -191,6 +191,8 @@
                     var volumes_down = 0;
                     var volumes_partial = 0;
                     var replica_count = bricksInfo.replica_count;
+                    var disperse_count = bricksInfo.disperse_count;
+                    var redundancy_count = bricksInfo.redundancy_count;
                     var volume_name = bricksInfo.volume_name;
                     var bricks = bricksInfo.bricks;
                     var bricks_down = bricks.filter(function(brick) {
@@ -205,7 +207,42 @@
                     }
                     local_count_volumes_down += volumes_down;
                     if (volumes_down == 0) {
-                        if (replica_count > 1) {
+                        /* Distributed Disperse */
+                        if (disperse_count > 0 && redundancy_count > 0) {
+                            var degraded = 0;
+                            var partial = 0;
+                            for (var i = 0; i < bricks.length / disperse_count; i++) {
+                                var downstate = 0;
+                                for (var j = 0; j < disperse_count; j++) {
+                                    var brick = bricks[(i * disperse_count) + j];
+                                    if (brick.status.state === 'down') downstate++;
+                                }
+                                if (downstate > redundancy_count) {
+                                    partial++;
+                                } else if (downstate > 0) {
+                                    degraded++;
+                                }
+                            }
+                            if (degraded > 0 && partial == 0) {
+                                volumes_degraded++;
+                                unhealthy_volumes.push({
+                                    name: volume_name,
+                                    status: "Degraded"
+                                });
+                            } else if (partial > 0 && partial != bricks.length / disperse_count) {
+                                volumes_partial++;
+                                unhealthy_volumes.push({
+                                    name: volume_name,
+                                    status: "Partial"
+                                });
+                            } else if (partial == bricks.length / disperse_count) {
+                                local_count_volumes_down++;
+                                unhealthy_volumes.push({
+                                    name: volume_name,
+                                    status: "Down"
+                                });
+                            }
+                        } else if (replica_count > 1) {
                             var maxset = 0;
                             for (var i = 0; i < bricks.length / replica_count; i++) {
                                 var downstate = 0;
