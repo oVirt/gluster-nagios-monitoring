@@ -75,6 +75,53 @@
                     content: {
                         text: $(this).next('div').html(),
                         title: $(this).next('div').attr('title')
+                    },
+                    hide: {
+                        event: false,
+                        fixed: true,
+                        inactive: 3000
+                    }
+                });
+            });
+            $('.hasTooltip-bottom').each(function() {
+                $(this).qtip({
+                    position: {
+                        my: 'top center',
+                        at: 'bottom center',
+                        target: $(this)
+                    },
+                    style: {
+                        classes: 'qtip-bootstrap'
+                    },
+                    content: {
+                        text: $(this).next('div').html(),
+                        title: $(this).next('div').attr('title')
+                    },
+                    hide: {
+                        event: false,
+                        fixed: true,
+                        inactive: 3000
+                    }
+                });
+            });
+            $('.NicTooltip').each(function() {
+                $(this).qtip({
+                    position: {
+                        my: 'bottom center',
+                        at: 'top center',
+                        target: $(this)
+                    },
+                    style: {
+                        classes: 'qtip-bootstrap'
+                    },
+                    content: {
+                        text: $(this).next('div').html(),
+                        title: $(this).next('div').attr('title'),
+                        button: true
+                    },
+                    hide: {
+                        event: false,
+                        fixed: true,
                     }
                 });
             });

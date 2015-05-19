@@ -36,7 +36,7 @@
                         <li role="presentation" ng-repeat="cluster in summary.cluster_list"><a role="menuitem" tabindex="-1" ng-click="switchCluster(cluster)">{{cluster.name}}</a> </li>
                     </ul>
                 </div>
-                <label ng-if="summary.health_status=='Unhealthy'" class="critical hasTooltip card-title bold pull-right">
+                <label ng-if="summary.health_status=='Unhealthy'" class="critical hasTooltip-bottom card-title bold pull-right">
                     <label ng-if="summary.selected_cluster.name=='All Clusters'" class="gray"></label><i class="fa fa-lg fa-heartbeat" style="color:#E35C5C;"><a ng-if="summary.selected_cluster=='undefined'" class="badge superfix-badge">{{summary.unhealthy_cluster_list.length}}</a></i> &nbsp;&nbsp;&nbsp;&nbsp; </label>
                 <div class="hidden" title="Unhealthy Clusters" ng-if="summary.selected_cluster=='undefined'">
                     <div role="presentation" style="text-align:center;" ng-repeat="cluster in summary.unhealthy_cluster_list">{{cluster.name}}</div>
@@ -51,7 +51,7 @@
                         <div ng-if="summary.all_volumes.length == 0">
                             <div class="inner-title center-error"> No Volume found</div>
                         </div>
-                        <div ng-if="summary.all_volumes.length > 0" class="cpu-hover card-body-flip front_volume hasTooltip" style="position:relative; width:100%;height: 120px;">
+                        <div ng-if="summary.all_volumes.length > 0" class="cpu-hover card-body-flip front_volume hasTooltip-bottom" style="position:relative; width:100%;height: 120px;">
                             <div class="inner-title" style="float:left;width:33%;padding-bottom:20px;"> {{summary.total_space_units}}
                                 <br/>Total </div>
                             <div class="inner-title" style="float:left;width:33%;"> {{summary.available_space_units}}
@@ -63,8 +63,9 @@
                             </div>
                         </div>
                         <div class="hidden" title="Top space utilizers" ng-if="summary.volume_usage_percent.length>0">
-                            <div ng-repeat="usage in summary.volume_usage_percent" ng-if="$index < 3">
-                                <p class="gray" align="center" style="line-height:1em;"> <span class="usage" ng-if="usage['usage'] < 81"><b class="ok">{{usage["usage"]}}% </b>- {{usage["name"]}}</span> <span class="usage" ng-if="usage['usage'] > 80 && usage['usage'] < 91"><b class="warning">{{usage["usage"]}}% </b>- {{usage["name"]}}</span> <span class="usage" ng-if="usage['usage'] > 90"><b class="critical">{{usage["usage"]}}% </b>- {{usage["name"]}}</span> </p>
+                            <div ng-repeat="usage in summary.volume_usage_percent" ng-if="$index < 3" class="gray tooltip-wrapper">
+                                <div class="usage" ng-class="usage['usage'] >= 90 ? 'critical' : ( usage['usage'] >= 80 ? 'warning' : 'ok')">{{usage["usage"]}}% </div>
+                                <div class="usage-entity"> {{usage["name"]}}</div>
                             </div>
                         </div>
                     </a>
@@ -78,18 +79,24 @@
                             <div class="inner-title center-error"> No UP host found</div>
                         </div>
                         <div ng-if="summary.cpu_usage_list.length > 0" class="front">
-                            <div ng-if="summary.cpu_usage_list.length > 0" class="card-body clear inner-title cpu hasTooltip">
+                            <div ng-if="summary.cpu_usage_list.length > 0" class="card-body clear inner-title cpu hasTooltip-bottom">
                                 <div class="dash-bold"> <i class="fa fa-laptop"></i> {{summary.average_cpu_usage}} % </div> CPU </div>
                             <div class="hidden" title="Top CPU utilizers">
                                 <div ng-repeat="usage in summary.cpu_usage_list" ng-if="$index < 4">
-                                    <p class="gray" align="justify" style="line-height:1em;padding-left:10px;"> <span class="usage" ng-if="usage['usage'] < 81"><b class="ok">{{usage["usage"]}}% </b>- {{usage["name"]}}</span> <span class="usage" ng-if="usage['usage'] > 80 && usage['usage'] < 91"><b class="warning">{{usage["usage"]}}% </b>- {{usage["name"]}}</span> <span class="usage" ng-if="usage['usage'] > 90"><b class="critical">{{usage["usage"]}}% </b>- {{usage["name"]}}</span> </p>
+                                    <div class="gray tooltip-wrapper">
+                                        <div class="usage" ng-class="usage['usage'] >= 90 ? 'critical' : ( usage['usage'] >= 80 ? 'warning' : 'ok')">{{usage["usage"]}}% </div>
+                                        <div class="usage-entity"> {{usage["name"]}}</div>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="card-body inner-title mem hasTooltip">
+                            <div class="card-body inner-title mem hasTooltip-bottom">
                                 <div class="dash-bold"> <i class="fa fa-database "></i> {{summary.average_memory_usage}} % </div> Memory </div>
                             <div class="hidden" title="Top Memory utilizers">
                                 <div ng-repeat="usage in summary.memory_usage_list" ng-if="$index < 4">
-                                    <p class="gray" align="justify" style="line-height:1em;padding-left:10px;"> <span class="usage" ng-if="usage['usage'] < 81"><b class="ok">{{usage["usage"]}}% </b>- {{usage["name"]}}</span> <span class="usage" ng-if="usage['usage'] > 80 && usage['usage'] < 91"><b class="warning">{{usage["usage"]}}% </b>- {{usage["name"]}}</span> <span class="usage" ng-if="usage['usage'] > 90"><b class="critical">{{usage["usage"]}}% </b>- {{usage["name"]}}</span> </p>
+                                    <div class="gray tooltip-wrapper">
+                                        <div class="usage" ng-class="usage['usage'] >= 90 ? 'critical' : ( usage['usage'] >= 80 ? 'warning' : 'ok')">{{usage["usage"]}}% </div>
+                                        <div class="usage-entity"> {{usage["name"]}}</div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -137,7 +144,11 @@
                             <div class="headline">{{summary.hosts_up+summary.hosts_down_list.length}}</div>
                             <div class="subline hasTooltip" ng-if="summary.hosts_down_list.length>0">{{summary.hosts_down_list.length}} Down </div>
                             <div class="hidden" title="Hosts Down">
-                                <div role="presentation" ng-repeat="host in summary.hosts_down_list">{{host}}</div>
+                                <div role="presentation" ng-repeat="host in summary.hosts_down_list">
+                                    <div class="gray tooltip-wrapper" style="width:auto !important;">
+                                        <div class="usage" style="width:auto !important;">{{host}} </div>
+                                    </div>
+                                </div>
                             </div>
                         </a>
                     </div>
@@ -152,7 +163,12 @@
                             <div class="headline">{{summary.volumes_up+summary.volumes_stopped}}</div>
                             <div class="subline hasTooltip"> <span ng-if="summary.volumes_degraded>0"> {{summary.volumes_degraded}}-Degraded </span> <span ng-if="summary.volumes_partial>0"> {{summary.volumes_partial}}-Partial </span> <span ng-if="summary.volumes_down>0"> {{summary.volumes_down}}-Down </span> <span ng-if="summary.volumes_stopped>0"> {{summary.volumes_stopped}}-Stopped </span> </div>
                             <div class="hidden" title="Critical Volumes">
-                                <div role="presentation" ng-repeat="volume in summary.unhealthy_volumes">{{volume["name"]}} - {{volume["status"]}}</div>
+                                <div role="presentation" ng-repeat="volume in summary.unhealthy_volumes">
+                                    <div class="gray tooltip-wrapper" style="width:auto !important;">
+                                        <div class="usage" style="width:auto !important;" ng-class="volume['status'] === 'Degraded' ? 'warning' : 'critical'">{{volume["name"]}} </div>
+                                        <div class="usage-entity" style="width:auto !important;"> {{volume["status"]}} </div>
+                                    </div>
+                                </div>
                             </div>
                         </a>
                     </div> {{tooltip()}}</div>
@@ -164,9 +180,16 @@
                     <div class="content">
                         <a href="./../../#hosts" target="_top">
                             <div class="headline">{{summary.nic_up+summary.nic_down_list.length}}</div>
-                            <div class="subline hasTooltip" ng-if="summary.nic_down_list.length>0">{{summary.nic_down_list.length}} Down </div>
+                            <div class="subline NicTooltip" ng-if="summary.nic_down_list.length>0">{{summary.nic_down_list.length}} Down </div>
                             <div class="hidden" title="NICs Down">
-                                <div role="presentation" ng-repeat="nic in summary.nic_down_list">{{nic.host_name}} - {{nic.nic_name}} - {{nic.state}}</div>
+                                <div class="nic-tooltip">
+                                <div role="presentation" ng-repeat="nic in summary.nic_down_list">
+                                    <div class="gray tooltip-wrapper" style="height:scroll !important; max-height:150px;">
+                                        <div class="usage" style="width:auto !important;">{{nic.host_name}} </div>
+                                        <div class="usage-entity" style="width:auto !important;"> {{nic.nic_name}} </div>
+                                    </div>
+                                </div>
+                            </div>
                             </div>
                         </a>
                     </div>
@@ -182,12 +205,22 @@
                             <div class="card-body clear inner-title cpu hasTooltip">
                                 <div class="dash-bold"> <i class="fa fa-cloud-upload"></i> {{summary.average_data_transmitted}}</div> TX </div>
                             <div class="hidden" title="Top data transmitters">
-                                <div ng-repeat="usage in summary.data_received_list" ng-if="$index < 3"> {{usage["usage"]}} - {{usage["ip"]}} </div>
+                                <div ng-repeat="usage in summary.data_received_list" ng-if="$index < 3">
+                                    <div class="gray tooltip-wrapper">
+                                        <div class="usage" style="width:auto !important;">{{usage["usage"]}} </div>
+                                        <div class="usage-entity" style="width:auto !important;"> {{usage["ip"]}}</div>
+                                    </div>
+                                </div>
                             </div>
                             <div class="card-body inner-title mem hasTooltip">
                                 <div class="dash-bold"> <i class="fa fa-cloud-download "></i> {{summary.average_data_received}}</div> RX </div>
                             <div class="hidden" title="Top data Receivers">
-                                <div ng-repeat="usage in summary.data_transmitted_list" ng-if="$index < 3"> {{usage["usage"]}} - {{usage["ip"]}} </div>
+                                <div ng-repeat="usage in summary.data_transmitted_list" ng-if="$index < 3">
+                                    <div class="gray tooltip-wrapper">
+                                        <div class="usage" style="width:auto !important;">{{usage["usage"]}} </div>
+                                        <div class="usage-entity" style="width:auto !important;"> {{usage["ip"]}}</div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </a>
