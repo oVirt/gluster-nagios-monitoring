@@ -3,6 +3,6 @@
     "url": "plugin/GlusterNagiosMonitoring/start.html",
     "resourcePath": "gluster-nagios-monitoring",
     "config": {
-        "showTrends": "true"
+        "showTrends": true
     }
 }
