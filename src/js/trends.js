@@ -92,19 +92,19 @@
                 var graphUrls = [];
                 switch (treeItemType) {
                 case "Volume":
-                    clusterService.getClusters().then(function(clusters) {
+                    clusterService.getClusters("undefined").then(function(clusters) {
                         for(var i = 0 ; i < clusters.length ; i++) {
                             if (clusters[i].id == clusterId) {
                                 hosts[j] = clusters[i].name;
                                 j++;
                             }
                         }
-                        
+
                         services = ["Volume Utilization - " + treeEntity];
                         graphUrls = graphUtils.getGraphs(pnp4NagiosUrl,hosts,services);
                         var length = graphUrls.length;
                         volumeService.getBricks(clusterId, treeParentId).then(function(bricks) {
-                            hostService.getHosts().then(function(thosts) {
+                            hostService.getHosts("undefined").then(function(thosts) {
                                 for(var i = 0 ; i < bricks.length ; i++) {
                                     for(var j = 0 ; j < thosts.length ; j++) {
                                         if (bricks[i].server_id == thosts[j].id) {
@@ -123,7 +123,7 @@
                     });
                     break;
                 case "Hosts" :
-                    hostService.getHosts().then(function(tHosts) {
+                    hostService.getHosts("undefined").then(function(tHosts) {
                         services[0] = "Cpu Utilization";
                         for(var i = 0 ; i < tHosts.length; i++) {
                             if (tHosts[i].cluster.id == treeParentId) {
@@ -132,7 +132,7 @@
                             }
                         }
                         caller.setGraphs(graphUtils.getGraphs(pnp4NagiosUrl,hosts,services));
-                        
+
                     });
                     break;
                 case "Volumes" :
@@ -147,7 +147,7 @@
                     break;
                 case "System" :
                 default :
-                    clusterService.getClusters().then(function(clusters) {
+                    clusterService.getClusters("undefined").then(function(clusters) {
                         services[0] = "Cluster Utilization";
                         for(var i = 0 ; i < clusters.length ; i++) {
                             hosts[i] = clusters[i].name;
@@ -155,7 +155,7 @@
                         caller.setGraphs(graphUtils.getGraphs(pnp4NagiosUrl,hosts,services));
                     });
                     break;
-                }                
+                }
             },
             getPnp4NagiosUrl : function() {
                 /*
