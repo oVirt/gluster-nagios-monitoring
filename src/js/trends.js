@@ -103,8 +103,9 @@
                         services = ["Volume Utilization - " + treeEntity];
                         graphUrls = graphUtils.getGraphs(pnp4NagiosUrl,hosts,services);
                         var length = graphUrls.length;
-                        volumeService.getBricks(clusterId, treeParentId).then(function(bricks) {
+                        volumeService.getBricks(clusterId, treeParentId).then(function(bricksMap) {
                             hostService.getHosts("undefined").then(function(thosts) {
+                                var bricks = bricksMap.bricks;
                                 for(var i = 0 ; i < bricks.length ; i++) {
                                     for(var j = 0 ; j < thosts.length ; j++) {
                                         if (bricks[i].server_id == thosts[j].id) {
