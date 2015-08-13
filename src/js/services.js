@@ -198,12 +198,12 @@
     var utilService = function() {
         return {
             convertSize: function(bytes) {
-                var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+                var sizes = ['B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB'];
                 var posttxt = 0;
                 if (bytes < 1024) {
                     return Number(bytes) + " " + sizes[posttxt];
                 }
-                while (bytes >= 1024) {
+                while (bytes >= 1024 && posttxt < (sizes.length - 1)) {
                     posttxt++;
                     bytes = bytes / 1024;
                 }
