@@ -507,8 +507,10 @@
         };
     }]);
 
-    mod.run(['messageUtil', 'dataManager', function (messageUtil, dataManager) {
+    mod.run(['messageUtil', 'dataManager', 'sessionManager', function (messageUtil, dataManager, sessionManager) {
         dataManager.exposeTestDataFunction();
+        sessionManager.exposeSession();
+        messageUtil.sendMessageToParent('getSession');
         messageUtil.sendMessageToParent('GetTabData');
     }]);
 

@@ -490,39 +490,8 @@
             $scope.summary.alerts = data;
         });
     }
-    mod.factory('sessionManager', ['$window', function($window) {
-        var sessionId;
-        return {
-            init: function(session) {
-                sessionId = session;
-            },
-            getSessionId: function() {
-                return sessionId;
-            },
-            exposeSession: function() {
-                var caller = this;
-                $window.setSessionId = function(sessionId) {
-                    caller.init(sessionId);
-                };
-            }
-        };
-    }]);
+
     mod.controller("SummaryCtrl", ['$scope', '$interval', '$q', 'ClusterService', 'VolumeService', 'HostService', 'UtilService', 'AlertService', summaryCtrl]);
-    mod.config(function($httpProvider) {
-        $httpProvider.defaults.headers.common = {
-            'Accept': 'application/json',
-            'Prefer': 'persistent-auth'
-        };
-        $httpProvider.defaults.withCredentials = true;
-        $httpProvider.interceptors.push(function(sessionManager) {
-            return {
-                'request': function(config) {
-                    config.headers.JSESSIONID = sessionManager.getSessionId();
-                    return config;
-                }
-            };
-        });
-    });
     mod.run(['sessionManager', 'messageUtil', function(sessionManager, messageUtil) {
         sessionManager.exposeSession();
         messageUtil.sendMessageToParent('getSession');

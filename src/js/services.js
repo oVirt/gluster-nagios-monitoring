@@ -212,4 +212,37 @@
         }
     }
     mod.factory('UtilService', [utilService]);
+    mod.factory('sessionManager', ['$window', function($window) {
+        var sessionId;
+        return {
+            init: function(session) {
+                sessionId = session;
+            },
+            getSessionId: function() {
+                return sessionId;
+            },
+            exposeSession: function() {
+                var caller = this;
+                $window.setSessionId = function(sessionId) {
+                    caller.init(sessionId);
+                };
+            }
+        };
+    }]);
+    mod.config(function($httpProvider) {
+        $httpProvider.defaults.headers.common = {
+            'Accept': 'application/json',
+            'Prefer': 'persistent-auth'
+        };
+        $httpProvider.defaults.withCredentials = true;
+        $httpProvider.interceptors.push(function(sessionManager) {
+            return {
+                'request': function(config) {
+                    config.headers.JSESSIONID = sessionManager.getSessionId();
+                    return config;
+                }
+            };
+        });
+    });
+
 }(angular.module('plugin.dashboard.services', [])));
