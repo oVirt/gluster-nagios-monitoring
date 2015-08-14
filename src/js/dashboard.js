@@ -370,15 +370,17 @@
                 angular.forEach(host_nic, function(host_nic) {
                     var host_name = host_nic.host_name;
                     angular.forEach(host_nic.nic, function(nic) {
-                        if (nic.status.state != 'up') {
-                            nic_down_list.push({
-                                host_name: host_name,
-                                state: nic.status.state,
-                                nic_name: nic.name
-                            });
-                        } else {
-                            nic_up++;
-                            host_nic_stat_promises.push(hostService.getNicStats(nic.host.id, nic.id, nic.ip));
+                        if(nic.ip.address != ''){
+                            if (nic.status.state != 'up') {
+                                nic_down_list.push({
+                                    host_name: host_name,
+                                    state: nic.status.state,
+                                    nic_name: nic.name
+                                });
+                            } else {
+                                nic_up++;
+                                host_nic_stat_promises.push(hostService.getNicStats(nic.host.id, nic.id, nic.ip));
+                            }
                         }
                     });
                 });
