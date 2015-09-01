@@ -135,21 +135,36 @@
             </div>
         </div>
         <div class="row">
+
             <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6 custom-gutter">
                 <div class="card"> <i ng-if="summary.hosts_down_list.length>0" class="fa fa-exclamation-circle critical fa-lg card-status"></i> <i ng-if="summary.hosts_down_list.length==0" class="fa fa-check-circle ok fa-lg card-status"></i> <span class="card-title"> <i class="fa fa-desktop fa-lg"></i>
                         Hosts
                     </span>
                     <div class="content">
                         <a href="./../../#hosts" target="_top">
-                            <div class="headline">{{summary.hosts_up+summary.hosts_down_list.length}}</div>
-                            <div class="subline hasTooltip" ng-if="summary.hosts_down_list.length>0">{{summary.hosts_down_list.length}} Down </div>
-                            <div class="hidden" title="Hosts Down">
-                                <div role="presentation" ng-repeat="host in summary.hosts_down_list">
-                                    <div class="gray tooltip-wrapper" style="width:auto !important;">
-                                        <div class="usage" style="width:auto !important;">{{host}} </div>
+                          <div class"usage-entity" >
+                            <div class="headline">{{summary.hosts_up+summary.hosts_down_list.length+summary.hosts_maintenance_list.length}}</div>
+                            <div ng-if="summary.hosts_down_list.length>0">
+                                <div class="subline hasTooltip"> {{summary.hosts_down_list.length}}-Down</div>
+                                <div class="hidden" title="Hosts Down">
+                                    <div role="presentation" ng-repeat="host in summary.hosts_down_list">
+                                        <div class="gray tooltip-wrapper" style="width:auto !important;">
+                                            <div class="usage" style="width:auto !important;">{{host}} </div>
+                                        </div>
                                     </div>
-                                </div>
+                               </div>
                             </div>
+                            <div ng-if="summary.hosts_maintenance_list.length>0">
+                                <div class="subline hasTooltip"> {{summary.hosts_maintenance_list.length}}-Maintenance</div>
+                                <div class="hidden" title="Hosts in Maintenance">
+                                    <div role="presentation" ng-repeat="host in summary.hosts_maintenance_list">
+                                        <div class="gray tooltip-wrapper" style="width:auto !important;">
+                                            <div class="usage" style="width:auto !important;">{{host}} </div>
+                                        </div>
+                                    </div>
+                               </div>
+                            </div>
+                          </div>
                         </a>
                     </div>
                 </div>

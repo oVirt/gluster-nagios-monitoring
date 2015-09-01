@@ -6,6 +6,7 @@
             unhealthy_volumes: [],
             hosts_up: 0,
             hosts_down_list: [],
+            hosts_maintenance_list: [],
             volumes_up: 0,
             volumes_down: 0,
             volumes_stopped: 0,
@@ -346,16 +347,20 @@
         hostService.getHosts($scope.summary.selected_cluster).
         then(function(hosts) {
             var no_of_hosts = hosts.length;
+            var up_hosts = [];
             var hosts_down_list = [];
-            var up_hosts = hosts.filter(function(host) {
-                return host.status.state == 'up';
-            });
+            var hosts_maintenance_list = [];
             angular.forEach(hosts, function(host) {
-                if (host.status.state != 'up') {
+                if( host.status.state == 'maintenance'){
+                    hosts_maintenance_list.push(host.name);
+                }else if( host.status.state == 'up'){
+                    up_hosts.push(host);
+                }else {
                     hosts_down_list.push(host.name);
                 }
             });
             $scope.summary.hosts_down_list = hosts_down_list;
+            $scope.summary.hosts_maintenance_list = hosts_maintenance_list;
             $scope.summary.hosts_up = up_hosts.length;
             var host_promises = [];
             var host_nic_promises = [];
