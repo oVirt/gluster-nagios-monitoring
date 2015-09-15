@@ -36,6 +36,27 @@
                         <li role="presentation" ng-repeat="cluster in summary.cluster_list"><a role="menuitem" tabindex="-1" ng-click="switchCluster(cluster)">{{cluster.name}}</a> </li>
                     </ul>
                 </div>
+                <label ng-if="summary.alerts.length>0" class="critical card-title bold pull-right">
+                    <label class="gray"></label><i class="fa fa-lg fa-bell-o" style="color:#E35C5C;"><a class="badge superfix-badge" data-toggle="modal" data-target="#myModal">{{summary.alerts.length}}</a></i> &nbsp;&nbsp;&nbsp;&nbsp;
+                </label>
+                    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                           <div class="modal-dialog modal-lg">
+                               <div class="modal-content">
+                                   <div class="modal-header">
+                                       <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span> </button>
+                                       <h4 class="modal-title" id="myModalLabel"><i class="fa fa-2 fa-exclamation-circle critical"></i> Alerts</h4> </div>
+                                   <div class="modal-body">
+                                       <div class="alert-dialog" title="Alerts">
+                                           <div ng-repeat="alert in summary.alerts">
+                                               <div class="alert alert-danger alert-dismissible" role="alert">
+                                                   <button type="button" class="close" data-dismiss="alert" aria-label="Close" ng-click="deleteAlert(alert)"><span aria-hidden="true">&times;</span> </button> <strong style="color:#000;">{{alert.time | date:'medium'}}</strong>
+                                                   <br/>{{alert.description}} </div>
+                                           </div>
+                                       </div>
+                                   </div>
+                               </div>
+                           </div>
+                       </div>
                 <label ng-if="summary.health_status=='Unhealthy'" class="critical hasTooltip-bottom card-title bold pull-right">
                     <label ng-if="summary.selected_cluster.name=='All Clusters'" class="gray"></label><i class="fa fa-lg fa-heartbeat" style="color:#E35C5C;"><a ng-if="summary.selected_cluster=='undefined'" class="badge superfix-badge">{{summary.unhealthy_cluster_list.length}}</a></i> &nbsp;&nbsp;&nbsp;&nbsp; </label>
                 <div class="hidden" title="Unhealthy Clusters" ng-if="summary.selected_cluster=='undefined'">
@@ -80,7 +101,7 @@
                         </div>
                         <div ng-if="summary.cpu_usage_list.length > 0" class="front">
                             <div ng-if="summary.cpu_usage_list.length > 0" class="card-body clear inner-title cpu hasTooltip-bottom">
-                                <div class="dash-bold"> <i class="fa fa-laptop"></i> {{summary.average_cpu_usage}} % </div> CPU </div>
+                                <div class="dash-bold"> <i class="fa fa-th-large"></i> {{summary.average_cpu_usage}} % </div> CPU </div>
                             <div class="hidden" title="Top CPU utilizers">
                                 <div ng-repeat="usage in summary.cpu_usage_list" ng-if="$index < 4">
                                     <div class="gray tooltip-wrapper">
@@ -90,7 +111,7 @@
                                 </div>
                             </div>
                             <div class="card-body inner-title mem hasTooltip-bottom">
-                                <div class="dash-bold"> <i class="fa fa-database "></i> {{summary.average_memory_usage}} % </div> Memory </div>
+                                <div class="dash-bold"> <i class="fa fa-bars "></i> {{summary.average_memory_usage}} % </div> Memory </div>
                             <div class="hidden" title="Top Memory utilizers">
                                 <div ng-repeat="usage in summary.memory_usage_list" ng-if="$index < 4">
                                     <div class="gray tooltip-wrapper">
@@ -104,42 +125,44 @@
                 </div>
             </div>
             <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12 custom-gutter">
-                <div class="card"> <span class="card-title">
-                    <i class="fa fa-exclamation-triangle fa-lg"></i> Alerts
-                        </span>
-                    <div class="content">
-                        <!-- <a href="./../../#events" target="_top"> -->
-                        <div class="headline"> <i ng-if="summary.alerts.length==0" class="fa fa-check-circle ok fa-lg"></i> <i ng-if="summary.alerts.length>0" class="fa fa-exclamation-circle critical fa-lg"></i> </div>
-                        <div class="subline" ng-if="summary.alerts.length>0"> <a data-toggle="modal" data-target="#myModal">{{summary.alerts.length}} alerts <i class="fa fa-external-link"></i></a> </div>
-                        <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-                            <div class="modal-dialog modal-lg">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span> </button>
-                                        <h4 class="modal-title" id="myModalLabel"><i class="fa fa-2 fa-exclamation-circle critical"></i> Alerts</h4> </div>
-                                    <div class="modal-body">
-                                        <div class="alert-dialog" title="Alerts">
-                                            <div ng-repeat="alert in summary.alerts">
-                                                <div class="alert alert-danger alert-dismissible" role="alert">
-                                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close" ng-click="deleteAlert(alert)"><span aria-hidden="true">&times;</span> </button> <strong style="color:#000;">{{alert.time | date:'medium'}}</strong>
-                                                    <br/>{{alert.description}} </div>
-                                            </div>
-                                        </div>
+                <div class="card cpu_mem"> <span class="card-title"> <i class="fa fa-exchange fa-rotate-90 fa-lg"></i>Network</span>
+                    <a href="./../../#hosts" target="_top">
+                        <div ng-if="summary.nic_up+summary.nic_down_list.length == 0">
+                            <div class="inner-title center-error"> No NIC found</div>
+                        </div>
+                        <div class="front" ng-if="summary.nic_up+summary.nic_down_list.length > 0">
+                            <div class="card-body clear inner-title cpu hasTooltip">
+                                <div class="dash-bold"> <i class="fa fa-cloud-upload"></i> {{summary.average_data_transmitted}}</div> TX </div>
+                            <div class="hidden" title="Top data transmitters">
+                                <div ng-repeat="usage in summary.data_received_list" ng-if="$index < 3">
+                                    <div class="gray tooltip-wrapper">
+                                        <div class="usage" style="width:auto !important;">{{usage["usage"]}} </div>
+                                        <div class="usage-entity" style="width:auto !important;"> {{usage["ip"]}}</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-body inner-title mem hasTooltip">
+                                <div class="dash-bold"> <i class="fa fa-cloud-download "></i> {{summary.average_data_received}}</div> RX </div>
+                            <div class="hidden" title="Top data Receivers">
+                                <div ng-repeat="usage in summary.data_transmitted_list" ng-if="$index < 3">
+                                    <div class="gray tooltip-wrapper">
+                                        <div class="usage" style="width:auto !important;">{{usage["usage"]}} </div>
+                                        <div class="usage-entity" style="width:auto !important;"> {{usage["ip"]}}</div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <!-- </a> -->
-                    </div>
+                    </a>
                 </div>
             </div>
         </div>
         <div class="row">
-
-            <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6 custom-gutter">
-                <div class="card"> <i ng-if="summary.hosts_down_list.length>0" class="fa fa-exclamation-circle critical fa-lg card-status"></i> <i ng-if="summary.hosts_down_list.length==0" class="fa fa-check-circle ok fa-lg card-status"></i> <span class="card-title"> <i class="fa fa-desktop fa-lg"></i>
-                        Hosts
-                    </span>
+            <div ng-class="summary.show_vm_status ? 'col-lg-3 col-md-3' : 'col-lg-4 col-md-4'" class="col-sm-6 col-xs-6 custom-gutter">
+                <div class="card">
+                  <i ng-if="summary.hosts_maintenance_list.length>0" class="fa fa-exclamation-circle warning fa-lg card-status"></i>
+                  <i ng-if="summary.hosts_down_list.length>0" class="fa fa-exclamation-circle critical fa-lg card-status"></i>
+                  <i ng-if="summary.hosts_down_list.length==0 && summary.hosts_maintenance_list.length==0" class="fa fa-check-circle ok fa-lg card-status"></i>
+                  <span class="card-title"> <i class="fa fa-desktop fa-lg"></i>Hosts</span>
                     <div class="content">
                         <a href="./../../#hosts" target="_top">
                           <div class"usage-entity" >
@@ -169,7 +192,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6 custom-gutter">
+            <div ng-class="summary.show_vm_status ? 'col-lg-3 col-md-3' : 'col-lg-4 col-md-4'" class="col-sm-6 col-xs-6 custom-gutter">
                 <div class="card"> <i ng-if="(summary.volumes_degraded + summary.volumes_down + summary.volumes_partial)==0" class="fa fa-check-circle ok fa-lg card-status"></i> <i ng-if="summary.volumes_degraded>0 && summary.volumes_down==0" class="fa fa-exclamation-circle warning fa-lg card-status"></i> <i ng-if="summary.volumes_down>0 || summary.volumes_partial>0" class="fa fa-exclamation-circle critical fa-lg card-status"></i> <span class="card-title"> <i class="fa fa-database fa-lg"></i>
                             Volumes
                         </span>
@@ -188,7 +211,38 @@
                         </a>
                     </div> {{tooltip()}}</div>
             </div>
-            <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6 custom-gutter">
+            <div  ng-show="summary.show_vm_status" class="col-lg-3 col-md-3 col-sm-6 col-xs-6 custom-gutter">
+              <div class="card"><i ng-if="(summary.vms_in_error_list.length==0 && summary.vms_paused_list.length==0)" class="fa fa-check-circle ok fa-lg card-status"></i><i ng-if="summary.vms_in_error_list.length>0 || summary.vms_paused_list.length>0" class="fa fa-exclamation-circle critical fa-lg card-status"></i> <span class="card-title"> <i class="fa fa-toggle-right fa-lg"></i>
+                          Virtual Machines
+                      </span>
+                  <div class="content">
+                      <a href="./../../#vms" target="_top">
+                          <div class="headline">{{summary.vms_up_list.length+summary.vms_down_list.length +summary.vms_paused_list.length + summary.vms_in_error_list.length}}</div>
+                          <div class="subline hasTooltip"> <span ng-if="summary.vms_down_list.length"> {{summary.vms_down_list.length}}-Down </span> <span ng-if="summary.vms_paused_list.length>0"> {{summary.vms_paused_list.length}}-Paused </span> <span ng-if="summary.vms_in_error_list.length>0"> {{summary.vms_in_error_list.length}}-Error </span>  </div>
+                          <div class="hidden" title="Critical VMs">
+                              <div role="presentation" ng-repeat="vm in summary.vms_down_list">
+                                  <div class="gray tooltip-wrapper" style="width:auto !important;">
+                                      <div class="usage" style="width:auto !important;" ng-class="'critical'">{{vm["name"]}} </div>
+                                      <div class="usage-entity" style="width:auto !important;"> {{vm.status.state}} </div>
+                                  </div>
+                              </div>
+                              <div role="presentation" ng-repeat="vm in summary.vms_paused_list">
+                                  <div class="gray tooltip-wrapper" style="width:auto !important;">
+                                      <div class="usage" style="width:auto !important;" ng-class="'critical'">{{vm["name"]}} </div>
+                                      <div class="usage-entity" style="width:auto !important;"> {{vm.status.state}} </div>
+                                  </div>
+                              </div>
+                              <div role="presentation" ng-repeat="vm in summary.vms_in_error_list">
+                                  <div class="gray tooltip-wrapper" style="width:auto !important;">
+                                      <div class="usage" style="width:auto !important;" ng-class="'critical'">{{vm["name"]}} </div>
+                                      <div class="usage-entity" style="width:auto !important;"> {{vm.status.state}} </div>
+                                  </div>
+                              </div>
+                          </div>
+                      </a>
+                  </div> {{tooltip()}}</div>
+            </div>
+            <div ng-class="summary.show_vm_status ? 'col-lg-3 col-md-3' : 'col-lg-4 col-md-4'" class="col-sm-6 col-xs-6 custom-gutter">
                 <div class="card"> <i ng-if="summary.nic_down_list.length>0" class="fa fa-exclamation-circle critical fa-lg card-status"></i> <i ng-if="summary.nic_down_list.length==0" class="fa fa-check-circle ok fa-lg card-status"></i> <span class="card-title"> <i class="fa fa-server fa-lg"></i>
                         NIC
                     </span>
@@ -208,37 +262,6 @@
                             </div>
                         </a>
                     </div>
-                </div>
-            </div>
-            <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6 custom-gutter">
-                <div class="card cpu_mem"> <span class="card-title"> <i class="fa fa-exchange fa-rotate-90 fa-lg"></i>Network</span>
-                    <a href="./../../#hosts" target="_top">
-                        <div ng-if="summary.nic_up+summary.nic_down_list.length == 0">
-                            <div class="inner-title center-error"> No NIC found</div>
-                        </div>
-                        <div class="front" ng-if="summary.nic_up+summary.nic_down_list.length > 0">
-                            <div class="card-body clear inner-title cpu hasTooltip">
-                                <div class="dash-bold"> <i class="fa fa-cloud-upload"></i> {{summary.average_data_transmitted}}</div> TX </div>
-                            <div class="hidden" title="Top data transmitters">
-                                <div ng-repeat="usage in summary.data_received_list" ng-if="$index < 3">
-                                    <div class="gray tooltip-wrapper">
-                                        <div class="usage" style="width:auto !important;">{{usage["usage"]}} </div>
-                                        <div class="usage-entity" style="width:auto !important;"> {{usage["ip"]}}</div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="card-body inner-title mem hasTooltip">
-                                <div class="dash-bold"> <i class="fa fa-cloud-download "></i> {{summary.average_data_received}}</div> RX </div>
-                            <div class="hidden" title="Top data Receivers">
-                                <div ng-repeat="usage in summary.data_transmitted_list" ng-if="$index < 3">
-                                    <div class="gray tooltip-wrapper">
-                                        <div class="usage" style="width:auto !important;">{{usage["usage"]}} </div>
-                                        <div class="usage-entity" style="width:auto !important;"> {{usage["ip"]}}</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </a>
                 </div>
             </div>
         </div>

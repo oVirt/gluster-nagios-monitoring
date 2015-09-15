@@ -59,6 +59,35 @@
         }
     }
     mod.factory('ClusterService', ['$http', clusterService]);
+    var vmService = function($http) {
+        return {
+          getVMs:function(cluster) {
+            if( cluster !== "undefined"){
+              return $http({
+                method: 'GET',
+                url: '/ovirt-engine/api/vms/?search=' + encodeURIComponent('cluster=' + cluster.name)
+              }).then(function(response){
+                if(typeof response.data.vm !== 'undefined'){
+                  return response.data.vm
+                }else {
+                  return [];
+                }
+              });
+            }
+            return $http({
+              method: 'GET',
+              url: '/ovirt-engine/api/vms/'
+            }).then(function(response){
+              if(typeof response.data.vm !== 'undefined'){
+                return response.data.vm
+              }else {
+                return [];
+              }
+            });
+          }
+        }
+    }
+    mod.factory('VmService', ['$http', vmService]);
     var hostService = function($http) {
         return {
             getHosts: function(cluster) {

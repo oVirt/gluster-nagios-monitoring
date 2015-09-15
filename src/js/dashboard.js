@@ -1,12 +1,17 @@
 (function(mod) {
-    var summaryCtrl = function($scope, $interval, $q, clusterService, volumeService, hostService, utilService, alertService) {
+    var summaryCtrl = function($scope, $interval, $q, clusterService, volumeService, hostService, utilService, alertService, vmService) {
         $scope.summary = {
+            show_vm_status: false,
             health_status: "Healthy",
             unhealthy_cluster_list: {},
             unhealthy_volumes: [],
             hosts_up: 0,
             hosts_down_list: [],
             hosts_maintenance_list: [],
+            vms_up_list: [],
+            vms_down_list: [],
+            vms_paused_list: [],
+            vms_in_error_list: [],
             volumes_up: 0,
             volumes_down: 0,
             volumes_stopped: 0,
@@ -39,12 +44,12 @@
             data_transmitted_list: []
         };
         $interval(function() {
-            loadData($scope, $q, clusterService, volumeService, hostService, utilService, alertService);
+            loadData($scope, $q, clusterService, volumeService, hostService, utilService, alertService, vmService);
         }, 10000, false);
         $interval(function() {
             VolumeStatRefresh($scope, $q, volumeService, utilService);
         }, 60000, false);
-        loadData($scope, $q, clusterService, volumeService, hostService, utilService, alertService);
+        loadData($scope, $q, clusterService, volumeService, hostService, utilService, alertService, vmService);
         VolumeStatRefresh($scope, $q, volumeService, utilService);
         $scope.switchCluster = function(cluster) {
             if (cluster === 'undefined') {
@@ -53,7 +58,7 @@
                 $scope.summary.selected_cluster = cluster;
             }
             $scope.summary.volume_Stat_Update_Flag = 0;
-            loadData($scope, $q, clusterService, volumeService, hostService, utilService, alertService);
+            loadData($scope, $q, clusterService, volumeService, hostService, utilService, alertService, vmService);
         };
         $scope.deleteAlert = function(alertObj) {
             alertService.deleteAlert(alertObj.id);
@@ -187,7 +192,7 @@
             $scope.summary.total_space_units = utilService.convertSize(total_space);
         });
     }
-    var loadData = function($scope, $q, clusterService, volumeService, hostService, utilService, alertService) {
+    var loadData = function($scope, $q, clusterService, volumeService, hostService, utilService, alertService, vmService) {
         $scope.summary.unhealthy_volumes = [];
         clusterService.getClusters($scope.summary.selected_cluster).
         then(function(clusters) {
@@ -195,7 +200,11 @@
                 $scope.summary.cluster_list = clusters;
             }
             var list = [];
+            $scope.summary.show_vm_status = false;
             angular.forEach(clusters, function(cluster) {
+                if (cluster.virt_service === "true"){
+                    $scope.summary.show_vm_status = true;
+                }
                 list.push(volumeService.getVolumes(cluster.id));
             });
             return $q.all(list);
@@ -492,13 +501,38 @@
             average = (total_cpu_usage_percent / hostStatistics.length).toFixed(1);
             $scope.summary.average_cpu_usage = isNaN(average) ? 'n/a' : average;
         });
+        vmService.getVMs($scope.summary.selected_cluster).
+        then(function(vms){
+          var no_of_vms = vms.length;
+          var vms_up_list = [];
+          var vms_down_list = [];
+          var vms_paused_list = [];
+          var vms_in_error_list = [];
+
+          angular.forEach(vms, function(vm) {
+            if (['up', 'powering_up', 'powering_down','reboot_in_progress', 'migrating', 'saving_state', 'restoring_state'].indexOf(vm.status.state) >= 0) {
+                vms_up_list.push(vm);
+            }else if(['wait_for_launch', 'down', ' image_locked'].indexOf(vm.status.state) >= 0) {
+                vms_down_list.push(vm);
+            }else if(vm.status.state == 'paused') {
+                vms_paused_list.push(vm);
+            }else{
+                vms_in_error_list.push(vm);
+            }
+          });
+
+          $scope.summary.vms_up_list = vms_up_list;
+          $scope.summary.vms_down_list = vms_down_list;
+          $scope.summary.vms_paused_list = vms_paused_list;
+          $scope.summary.vms_in_error_list = vms_in_error_list;
+        });
         alertService.getAlerts($scope.summary.selected_cluster).
         then(function(data) {
             $scope.summary.alerts = data;
         });
     }
 
-    mod.controller("SummaryCtrl", ['$scope', '$interval', '$q', 'ClusterService', 'VolumeService', 'HostService', 'UtilService', 'AlertService', summaryCtrl]);
+    mod.controller("SummaryCtrl", ['$scope', '$interval', '$q', 'ClusterService', 'VolumeService', 'HostService', 'UtilService', 'AlertService', 'VmService', summaryCtrl]);
     mod.run(['sessionManager', 'messageUtil', function(sessionManager, messageUtil) {
         sessionManager.exposeSession();
         messageUtil.sendMessageToParent('getSession');
