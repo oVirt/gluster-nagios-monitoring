@@ -79,13 +79,20 @@ body {
   text-align: center;
 }
 
-.card .subline {
+.card .content {
   color: #5e6a71;
   font-family: "Titillium Web", sans-serif;
-  font-size: 1.5em;
   font-weight: 300;
   margin-top: 10px;
   text-align: center;
+}
+
+.card .subline {
+  font-size: 1.5em;
+}
+
+.card .upcount {
+  font-size: 0.4em;
 }
 
 .card .content {

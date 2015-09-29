@@ -166,7 +166,8 @@
                     <div class="content">
                         <a href="./../../#hosts" target="_top">
                           <div class"usage-entity" >
-                            <div class="headline">{{summary.hosts_up+summary.hosts_down_list.length+summary.hosts_maintenance_list.length}}</div>
+                            <div class="headline">{{summary.hosts_up}}&nbsp/&nbsp{{summary.hosts_up+summary.hosts_down_list.length+summary.hosts_maintenance_list.length}}
+                            <span class="upcount">UP</span></div>
                             <div ng-if="summary.hosts_down_list.length>0">
                                 <div class="subline hasTooltip"> {{summary.hosts_down_list.length}}-Down</div>
                                 <div class="hidden" title="Hosts Down">
@@ -198,7 +199,8 @@
                         </span>
                     <div class="content">
                         <a href="./../../#volumes" target="_top">
-                            <div class="headline">{{summary.volumes_up+summary.volumes_stopped}}</div>
+                            <div class="headline">{{summary.volumes_up}}&nbsp/&nbsp{{summary.volumes_up+summary.volumes_stopped}}
+                            <span class="upcount">UP</span></div>
                             <div class="subline hasTooltip"> <span ng-if="summary.volumes_degraded>0"> {{summary.volumes_degraded}}-Degraded </span> <span ng-if="summary.volumes_partial>0"> {{summary.volumes_partial}}-Partial </span> <span ng-if="summary.volumes_down>0"> {{summary.volumes_down}}-Down </span> <span ng-if="summary.volumes_stopped>0"> {{summary.volumes_stopped}}-Stopped </span> </div>
                             <div class="hidden" title="Critical Volumes">
                                 <div role="presentation" ng-repeat="volume in summary.unhealthy_volumes">
@@ -211,13 +213,14 @@
                         </a>
                     </div> {{tooltip()}}</div>
             </div>
-            <div  ng-show="summary.show_vm_status" class="col-lg-3 col-md-3 col-sm-6 col-xs-6 custom-gutter">
+            <div  ng-show="summary.show_vm_status" ng-class="summary.show_vm_status ? 'col-lg-3 col-md-3' : 'col-lg-4 col-md-4'" class="col-sm-6 col-xs-6 custom-gutter">
               <div class="card"><i ng-if="(summary.vms_in_error_list.length==0 && summary.vms_paused_list.length==0)" class="fa fa-check-circle ok fa-lg card-status"></i><i ng-if="summary.vms_in_error_list.length>0 || summary.vms_paused_list.length>0" class="fa fa-exclamation-circle critical fa-lg card-status"></i> <span class="card-title"> <i class="fa fa-toggle-right fa-lg"></i>
                           Virtual Machines
                       </span>
                   <div class="content">
                       <a href="./../../#vms" target="_top">
-                          <div class="headline">{{summary.vms_up_list.length+summary.vms_down_list.length +summary.vms_paused_list.length + summary.vms_in_error_list.length}}</div>
+                          <div class="headline">{{summary.vms_up_list.length}}&nbsp/&nbsp{{summary.vms_up_list.length+summary.vms_down_list.length +summary.vms_paused_list.length + summary.vms_in_error_list.length}}
+                          <span class="upcount">UP</span></div>
                           <div class="subline hasTooltip"> <span ng-if="summary.vms_down_list.length"> {{summary.vms_down_list.length}}-Down </span> <span ng-if="summary.vms_paused_list.length>0"> {{summary.vms_paused_list.length}}-Paused </span> <span ng-if="summary.vms_in_error_list.length>0"> {{summary.vms_in_error_list.length}}-Error </span>  </div>
                           <div class="hidden" title="Critical VMs">
                               <div role="presentation" ng-repeat="vm in summary.vms_down_list">
@@ -248,7 +251,8 @@
                     </span>
                     <div class="content">
                         <a href="./../../#hosts" target="_top">
-                            <div class="headline">{{summary.nic_up+summary.nic_down_list.length}}</div>
+                          <div class="headline">{{summary.nic_up}}&nbsp/&nbsp{{summary.nic_up+summary.nic_down_list.length}}
+                          <span class="upcount">UP</span></div>
                             <div class="subline NicTooltip" ng-if="summary.nic_down_list.length>0">{{summary.nic_down_list.length}} Down </div>
                             <div class="hidden" title="NICs Down">
                                 <div class="nic-tooltip">
